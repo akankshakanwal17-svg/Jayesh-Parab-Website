@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jayesh Parab — Entrepreneur · Investor · Engineer · Goa</title>
+<meta name="description" content="Jayesh Parab — Entrepreneur, Investor, and Engineer dedicated to transforming Goa into a global hub for technology, education, sustainability, and startups.">
+<meta name="keywords" content="Jayesh Parab, Goa entrepreneur, Goa startup ecosystem, Goa investor, Goa tech, Goa 2030, startup Goa, angel investor Goa, engineer Goa, Panaji startup">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--navy:#05111f;--navy2:#091b30;--navy3:#0f2640;--navy4:#173350;--navy5:#1e4168;
+--white:#FFFFFF;--off:#f5f8fc;--off2:#eaf0f8;
+--gold:#b8893a;--gold2:#d4a855;--gold3:#ecc878;--gold4:#f5e2b0;
+--teal:#0e9e87;--teal2:#0cc9a8;
+--mid:#3d4f63;--light:#7a90a8;--border:#c8d8e8;--border2:#dce9f5;
+--font-display:'Playfair Display',Georgia,serif;
+--font-body:'Syne',system-ui,sans-serif;
+--font-mono:'JetBrains Mono',monospace;
+--max-w:1240px;--ease:cubic-bezier(0.22,1,0.36,1)
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--white);color:var(--navy);line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--navy)}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+.container{max-width:var(--max-w);margin:0 auto;padding:0 48px}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .75s var(--ease),transform .75s var(--ease)}
+.reveal.visible{opacity:1;transform:none}
+.reveal-delay-1{transition-delay:.12s!important}.reveal-delay-2{transition-delay:.24s!important}
+.reveal-delay-3{transition-delay:.36s!important}.reveal-delay-4{transition-delay:.48s!important}
+
+/* EYEBROW */
+.eyebrow{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2);display:inline-flex;align-items:center;gap:10px;margin-bottom:20px}
+.eyebrow::before{content:'';display:block;width:28px;height:1px;background:var(--gold2)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 48px;display:flex;align-items:center;justify-content:space-between;height:76px;transition:all .5s var(--ease)}
+nav.scrolled{background:rgba(5,17,31,.97);backdrop-filter:blur(24px);height:62px;border-bottom:1px solid rgba(196,162,58,.12);box-shadow:0 4px 32px rgba(0,0,0,.3)}
+.nav-logo{font-family:var(--font-display);font-size:21px;font-weight:700;color:var(--white);text-decoration:none;letter-spacing:.01em}
+.nav-logo span{color:var(--gold3)}
+.nav-links{display:flex;gap:32px;list-style:none;align-items:center}
+.nav-links a{color:rgba(255,255,255,.65);text-decoration:none;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;transition:color .3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-3px;left:0;right:100%;height:1px;background:var(--gold2);transition:right .35s var(--ease)}
+.nav-links a:hover{color:var(--white)}.nav-links a:hover::after{right:0}
+.nav-cta{background:var(--gold)!important;border:none!important;color:var(--navy)!important;padding:9px 22px!important;border-radius:2px!important;font-weight:700!important;transition:background .3s,transform .2s!important}
+.nav-cta:hover{background:var(--gold3)!important;transform:translateY(-1px)}.nav-cta::after{display:none!important}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px}
+.hamburger span{display:block;width:24px;height:2px;background:var(--white);transition:all .3s}
+.mobile-menu{display:none;position:fixed;inset:0;z-index:999;background:var(--navy);flex-direction:column;align-items:center;justify-content:center;gap:36px}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-family:var(--font-display);font-size:38px;font-weight:400;color:var(--white);text-decoration:none;opacity:.8;transition:opacity .3s,color .3s}
+.mobile-menu a:hover{opacity:1;color:var(--gold3)}
+.mobile-close{position:absolute;top:28px;right:36px;color:var(--white);font-size:28px;cursor:pointer;background:none;border:none}
+
+/* HERO */
+#hero{min-height:100vh;background:var(--navy);position:relative;overflow:hidden;display:flex;align-items:center}
+.hero-glow{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 62% 42%,rgba(23,51,80,.85) 0%,transparent 65%),radial-gradient(ellipse 45% 70% at 8% 85%,rgba(14,158,135,.07) 0%,transparent 55%);pointer-events:none}
+.hero-lines{position:absolute;inset:0;overflow:hidden;opacity:.04;background-image:linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px);background-size:80px 80px;animation:lineShift 20s linear infinite}
+@keyframes lineShift{0%{background-position:0 0}100%{background-position:80px 80px}}
+.hero-orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
+.hero-orb-1{width:500px;height:500px;top:-100px;right:-100px;background:rgba(196,162,58,.07);animation:orbFloat 12s ease-in-out infinite}
+.hero-orb-2{width:300px;height:300px;bottom:80px;left:10%;background:rgba(14,158,135,.06);animation:orbFloat 16s ease-in-out infinite reverse}
+@keyframes orbFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+.hero-inner{position:relative;z-index:2;width:100%;max-width:var(--max-w);margin:0 auto;padding:130px 48px 100px;display:grid;grid-template-columns:1.1fr .9fr;gap:80px;align-items:center}
+.hero-eyebrow{font-family:var(--font-mono);font-size:10.5px;color:var(--teal2);letter-spacing:.22em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:24px;opacity:0;animation:fadeUp .8s .2s var(--ease) forwards}
+.hero-eyebrow::before{content:'';display:block;width:32px;height:1px;background:var(--teal2)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.hero-name{font-family:var(--font-display);font-size:clamp(56px,6.5vw,100px);font-weight:900;line-height:.95;color:var(--white);letter-spacing:-.02em;margin-bottom:8px;opacity:0;animation:fadeUp .9s .35s var(--ease) forwards}
+.hero-name .first{font-weight:400;font-style:italic}.hero-name .last{color:var(--gold3);display:block}
+.hero-chips{display:flex;flex-wrap:wrap;gap:8px;margin:28px 0;opacity:0;animation:fadeUp .8s .5s var(--ease) forwards}
+.hero-chip{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.12);padding:5px 14px;border-radius:2px;transition:all .3s}
+.hero-chip:hover{border-color:var(--gold2);color:var(--gold3)}
+.hero-desc{font-size:17px;font-weight:400;color:rgba(255,255,255,.55);line-height:1.8;max-width:480px;margin-bottom:44px;opacity:0;animation:fadeUp .8s .65s var(--ease) forwards}
+.hero-desc em{color:var(--gold3);font-style:normal}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap;opacity:0;animation:fadeUp .8s .8s var(--ease) forwards}
+.btn-primary{background:var(--gold);color:var(--navy);padding:14px 32px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:background .3s,transform .2s;display:inline-block}
+.btn-primary:hover{background:var(--gold3);transform:translateY(-2px)}
+.btn-outline{background:transparent;color:rgba(255,255,255,.75);padding:13px 32px;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,.2);border-radius:2px;transition:all .3s;display:inline-block}
+.btn-outline:hover{border-color:var(--white);color:var(--white)}
+.hero-right{opacity:0;animation:fadeUp 1s .9s var(--ease) forwards}
+.hero-stat-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:28px 32px;margin-bottom:16px;transition:background .3s,border-color .3s;position:relative;overflow:hidden}
+.hero-stat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);transform:scaleY(0);transition:transform .4s var(--ease)}
+.hero-stat-card:hover{background:rgba(255,255,255,.05);border-color:rgba(196,162,58,.2)}.hero-stat-card:hover::before{transform:scaleY(1)}
+.stat-num{font-family:var(--font-display);font-size:42px;font-weight:700;color:var(--gold3);line-height:1;margin-bottom:6px}
+.stat-num sup{font-size:20px;color:var(--gold2)}
+.stat-label{font-size:13px;font-weight:600;color:var(--white);letter-spacing:.04em}
+.stat-sub{font-size:12px;color:rgba(255,255,255,.4);margin-top:3px}
+.hero-location{margin-top:24px;font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.15em;display:flex;align-items:center;gap:8px}
+.hero-location::before{content:'◉';color:var(--teal2)}
+.hero-scroll{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fadeUp 1s 1.2s var(--ease) forwards}
+.scroll-line{width:1px;height:48px;background:linear-gradient(to bottom,var(--gold2),transparent);animation:scrollLine 2s ease-in-out infinite}
+@keyframes scrollLine{0%,100%{opacity:.3;height:48px}50%{opacity:1;height:60px}}
+.scroll-text{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,.3);text-transform:uppercase;writing-mode:vertical-lr}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.about-image-block{position:relative;background:var(--navy2);border-radius:4px;overflow:hidden;aspect-ratio:4/5;max-width:400px}
+.about-image-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy3) 0%,var(--navy5) 100%);position:relative}
+.about-initials{font-family:var(--font-display);font-size:120px;font-weight:900;color:rgba(196,162,58,.12);letter-spacing:-.04em;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.about-image-badge{position:absolute;bottom:24px;right:-20px;background:var(--gold);color:var(--navy);padding:12px 20px;font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;border-radius:2px;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.about-image-line{position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;border-left:3px solid var(--gold);border-bottom:3px solid var(--gold);opacity:.4}
+.about-title{font-family:var(--font-display);font-size:clamp(36px,4vw,56px);font-weight:700;line-height:1.1;color:var(--navy);margin-bottom:28px;letter-spacing:-.02em}
+.about-title em{color:var(--gold);font-style:italic}
+.about-text{font-size:16px;color:var(--mid);line-height:1.85;margin-bottom:20px}
+.about-pillars{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:40px}
+.about-pillar{padding:20px;border:1px solid var(--border2);border-radius:4px;transition:border-color .3s,box-shadow .3s;position:relative;overflow:hidden}
+.about-pillar::before{content:'';position:absolute;bottom:0;left:0;right:100%;height:2px;background:var(--gold);transition:right .4s var(--ease)}
+.about-pillar:hover{border-color:var(--gold);box-shadow:0 4px 24px rgba(196,162,58,.08)}.about-pillar:hover::before{right:0}
+.pillar-icon{font-size:22px;margin-bottom:10px}
+.pillar-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.pillar-text{font-size:12px;color:var(--light);line-height:1.5}
+
+/* VISION */
+.vision-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 80% 50%,rgba(23,51,80,.6) 0%,transparent 60%),radial-gradient(ellipse 40% 60% at 10% 80%,rgba(14,158,135,.05) 0%,transparent 50%);pointer-events:none}
+.vision-header{text-align:center;margin-bottom:72px}
+.vision-title{font-family:var(--font-display);font-size:clamp(40px,5vw,64px);font-weight:700;color:var(--white);line-height:1.1;letter-spacing:-.02em;margin-bottom:20px}
+.vision-title em{color:var(--gold3);font-style:italic}
+.vision-sub{font-size:16px;color:rgba(255,255,255,.45);max-width:560px;margin:0 auto}
+.vision-pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.vision-pillar{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:36px 32px;position:relative;transition:background .3s,border-color .3s,transform .3s;overflow:hidden}
+.vision-pillar::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease)}
+.vision-pillar:hover{background:rgba(255,255,255,.05);border-color:rgba(196,162,58,.2);transform:translateY(-4px)}.vision-pillar:hover::after{transform:scaleX(1)}
+.vp-num{font-family:var(--font-mono);font-size:10px;color:var(--gold);letter-spacing:.2em;margin-bottom:20px}
+.vp-icon{font-size:32px;margin-bottom:16px}
+.vp-title{font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--white);margin-bottom:14px;line-height:1.2}
+.vp-text{font-size:14px;color:rgba(255,255,255,.45);line-height:1.75}
+.vp-bullets{margin-top:20px;list-style:none}
+.vp-bullets li{font-size:13px;color:rgba(255,255,255,.35);padding:6px 0;border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:10px}
+.vp-bullets li::before{content:'→';color:var(--gold);font-size:11px;flex-shrink:0}
+
+/* GOA 2030 */
+.goa-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.goa-title{font-family:var(--font-display);font-size:clamp(36px,4vw,56px);font-weight:700;line-height:1.1;color:var(--navy);letter-spacing:-.02em;margin-bottom:24px}
+.goa-title em{color:var(--gold);font-style:italic}
+.goa-text{font-size:16px;color:var(--mid);line-height:1.85;margin-bottom:20px}
+.goa-belief{margin-top:36px;padding:28px 32px;background:var(--navy);border-radius:4px;position:relative;overflow:hidden}
+.goa-belief::before{content:'"';position:absolute;top:-10px;left:20px;font-family:var(--font-display);font-size:100px;font-weight:900;color:var(--gold);opacity:.12;line-height:1}
+.goa-belief-text{font-family:var(--font-display);font-size:18px;font-style:italic;color:var(--white);line-height:1.65;position:relative;z-index:1}
+.goa-belief-attr{font-family:var(--font-mono);font-size:10px;letter-spacing:.15em;color:var(--gold2);margin-top:14px;text-transform:uppercase}
+.goa-milestones{display:flex;flex-direction:column;gap:0}
+.milestone{display:flex;align-items:center;gap:24px;padding:24px 0;border-bottom:1px solid var(--border2);transition:padding-left .3s var(--ease)}
+.milestone:first-child{border-top:1px solid var(--border2)}.milestone:hover{padding-left:12px}
+.milestone-num{font-family:var(--font-display);font-size:36px;font-weight:900;color:var(--gold);line-height:1;min-width:90px;letter-spacing:-.02em}
+.milestone-num span{font-size:18px;color:var(--gold2)}
+.milestone-label{font-size:15px;font-weight:700;color:var(--navy)}
+.milestone-sub{font-size:12px;color:var(--light);margin-top:3px}
+
+/* CREDO */
+.credo-inner{position:relative;z-index:1;max-width:820px;margin:0 auto;text-align:center}
+.credo-big-quote{font-family:var(--font-display);font-size:280px;font-weight:900;color:var(--gold);opacity:.06;line-height:.8;margin-bottom:-60px;display:block}
+.credo-text{font-family:var(--font-display);font-size:clamp(24px,3.5vw,40px);font-weight:400;font-style:italic;color:var(--white);line-height:1.5;margin-bottom:40px}
+.credo-divider{width:48px;height:1px;background:var(--gold);margin:0 auto 24px}
+.credo-author{font-family:var(--font-mono);font-size:12px;letter-spacing:.2em;color:var(--gold2);text-transform:uppercase;margin-bottom:32px}
+.credo-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.credo-chip{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.1);padding:6px 16px;border-radius:2px;transition:all .3s}
+.credo-chip:hover{color:var(--gold3);border-color:var(--gold)}
+
+/* BLOG */
+.blog-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:64px;flex-wrap:wrap;gap:24px}
+.blog-title{font-family:var(--font-display);font-size:clamp(36px,4vw,54px);font-weight:700;line-height:1.1;color:var(--navy);letter-spacing:-.02em}
+.blog-title em{color:var(--gold);font-style:italic}
+.blog-all-link{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);text-decoration:none;display:flex;align-items:center;gap:8px;transition:gap .3s;white-space:nowrap}
+.blog-all-link:hover{gap:14px}
+.blog-featured{display:grid;grid-template-columns:1.2fr .8fr;gap:0;border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:32px;transition:box-shadow .3s}
+.blog-featured:hover{box-shadow:0 12px 48px rgba(5,17,31,.08)}
+.bf-image{background:linear-gradient(135deg,var(--navy3) 0%,var(--navy5) 50%,var(--navy4) 100%);min-height:380px;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:32px}
+.bf-pattern{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.03) 1px,transparent 1px);background-size:28px 28px}
+.bf-image-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(14,158,135,.08) 0%,transparent 60%)}
+.bf-category{position:relative;z-index:1;background:var(--gold);color:var(--navy);font-family:var(--font-mono);font-size:9px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:5px 12px;border-radius:2px;display:inline-block}
+.bf-content{padding:40px 44px;display:flex;flex-direction:column;justify-content:space-between}
+.bf-meta{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;color:var(--light);text-transform:uppercase;margin-bottom:16px}
+.bf-title{font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:16px;text-decoration:none;display:block;transition:color .3s}
+.bf-title:hover{color:var(--gold)}
+.bf-excerpt{font-size:14px;color:var(--mid);line-height:1.75;flex-grow:1;margin-bottom:28px}
+.bf-read{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);text-decoration:none;display:flex;align-items:center;gap:8px;transition:gap .3s}
+.bf-read:hover{gap:14px}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:32px}
+.blog-card{border:1px solid var(--border2);border-radius:4px;overflow:hidden;transition:border-color .3s,box-shadow .3s,transform .3s;text-decoration:none;color:inherit;display:block}
+.blog-card:hover{border-color:var(--gold);box-shadow:0 8px 32px rgba(196,162,58,.08);transform:translateY(-4px)}
+.bc-image{height:180px;position:relative;overflow:hidden}
+.bc-image-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px}
+.bc-cat{position:absolute;top:14px;left:14px;background:var(--navy);color:var(--gold2);font-family:var(--font-mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;padding:4px 10px;border-radius:2px}
+.bc-content{padding:24px}
+.bc-meta{font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;color:var(--light);text-transform:uppercase;margin-bottom:10px;display:flex;gap:12px}
+.bc-title{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:10px;transition:color .3s}
+.blog-card:hover .bc-title{color:var(--gold)}
+.bc-excerpt{font-size:13px;color:var(--mid);line-height:1.65}
+.blog-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:32px}
+.blog-card-mini{border:1px solid var(--border2);border-radius:4px;padding:24px;transition:border-color .3s,box-shadow .3s;text-decoration:none;color:inherit;display:block}
+.blog-card-mini:hover{border-color:var(--gold);box-shadow:0 4px 16px rgba(196,162,58,.08)}
+.bcm-cat{font-family:var(--font-mono);font-size:9px;letter-spacing:.16em;color:var(--teal);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.bcm-cat::before{content:'●';font-size:6px}
+.bcm-title{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:10px;transition:color .3s}
+.blog-card-mini:hover .bcm-title{color:var(--gold)}
+.bcm-meta{font-family:var(--font-mono);font-size:10px;color:var(--light);letter-spacing:.1em}
+.blog-cta-bar{background:var(--navy);border-radius:4px;padding:36px 44px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.blog-cta-text{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--white)}
+.blog-cta-text span{color:var(--gold3)}
+.blog-cta-sub{font-size:13px;color:rgba(255,255,255,.45);margin-top:4px}
+
+/* CONNECT */
+.connect-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.connect-title{font-family:var(--font-display);font-size:clamp(36px,4vw,54px);font-weight:700;color:var(--navy);line-height:1.1;letter-spacing:-.02em;margin-bottom:24px}
+.connect-title em{color:var(--gold);font-style:italic}
+.connect-desc{font-size:16px;color:var(--mid);line-height:1.85;margin-bottom:36px}
+.connect-ways{display:flex;flex-direction:column;gap:12px}
+.connect-way{display:flex;align-items:center;gap:18px;padding:18px 22px;background:var(--white);border:1px solid var(--border2);border-radius:4px;text-decoration:none;transition:border-color .3s,box-shadow .3s,transform .2s}
+.connect-way:hover{border-color:var(--gold);box-shadow:0 4px 16px rgba(196,162,58,.08);transform:translateX(4px)}
+.cw-icon{font-size:20px}.cw-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--light)}
+.cw-value{font-size:14px;font-weight:600;color:var(--navy);margin-top:2px}
+.connect-form{display:flex;flex-direction:column;gap:18px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mid)}
+.form-group input,.form-group select,.form-group textarea{background:var(--white);border:1px solid var(--border);border-radius:2px;padding:12px 16px;font-family:var(--font-body);font-size:14px;color:var(--navy);transition:border-color .3s;outline:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold)}
+.form-group textarea{min-height:140px;resize:vertical}
+.form-group select{appearance:none;cursor:pointer}
+.form-submit{background:var(--navy);color:var(--white);border:none;padding:15px 36px;font-family:var(--font-body);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:2px;cursor:pointer;transition:background .3s,transform .2s;align-self:flex-start}
+.form-submit:hover{background:var(--gold);color:var(--navy);transform:translateY(-2px)}
+
+/* FOOTER */
+footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.05)}
+.footer-main{padding:60px 48px 40px;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;max-width:var(--max-w);margin:0 auto}
+.footer-logo{font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--white);margin-bottom:16px}
+.footer-logo span{color:var(--gold3)}
+.footer-tagline{font-size:13px;color:rgba(255,255,255,.35);margin-bottom:24px;line-height:1.6}
+.footer-socials{display:flex;gap:10px}
+.social-link{width:36px;height:36px;border:1px solid rgba(255,255,255,.1);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;transition:border-color .3s,background .3s}
+.social-link:hover{border-color:var(--gold);background:rgba(196,162,58,.1)}
+.footer-col-title{font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold2);margin-bottom:20px}
+.footer-links{display:flex;flex-direction:column;gap:12px}
+.footer-link{font-size:14px;color:rgba(255,255,255,.45);text-decoration:none;transition:color .3s}
+.footer-link:hover{color:var(--white)}
+.footer-bottom{padding:20px 48px;border-top:1px solid rgba(255,255,255,.04);max-width:var(--max-w);margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-copy{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.2);letter-spacing:.08em}
+.footer-copy a{color:var(--gold2);text-decoration:none}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:0 24px}.nav-links{display:none}.hamburger{display:flex}
+  .hero-inner{grid-template-columns:1fr;gap:48px;padding:120px 24px 80px}
+  .hero-right{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .hero-stat-card{margin-bottom:0}
+  .about-grid,.goa-grid,.connect-grid{grid-template-columns:1fr;gap:48px}
+  .about-image-block{max-width:100%;aspect-ratio:16/9}
+  .about-image-badge{right:24px}
+  .vision-pillars{grid-template-columns:1fr}
+  .blog-featured{grid-template-columns:1fr}.bf-image{min-height:220px}
+  .blog-grid{grid-template-columns:1fr}
+  .blog-grid-4{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr}
+  .footer-main{grid-template-columns:1fr 1fr;padding:48px 24px 32px}
+  .footer-bottom{padding:20px 24px}
+  .container{padding:0 24px}
+}
+@media(max-width:600px){
+  .blog-grid-4{grid-template-columns:1fr}
+  .footer-main{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav id="main-nav">
+  <a href="#" class="nav-logo">Jayesh <span>Parab</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#vision">Vision</a></li>
+    <li><a href="#goa2030">Goa 2030</a></li>
+    <li><a href="#blog">Blog</a></li>
+    <li><a href="#connect" class="nav-cta">Connect</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="mobile-menu" id="mobile-menu">
+  <button class="mobile-close" id="mobile-close">✕</button>
+  <a href="#about" class="mobile-link">About</a>
+  <a href="#vision" class="mobile-link">Vision</a>
+  <a href="#goa2030" class="mobile-link">Goa 2030</a>
+  <a href="#blog" class="mobile-link">Blog</a>
+  <a href="#connect" class="mobile-link">Connect</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">Panaji, Goa · India</div>
+      <h1 class="hero-name"><span class="first">Jayesh</span><strong class="last">Parab</strong></h1>
+      <div class="hero-chips">
+        <span class="hero-chip">Entrepreneur</span>
+        <span class="hero-chip">Investor</span>
+        <span class="hero-chip">Engineer</span>
+        <span class="hero-chip">Goa Believer</span>
+      </div>
+      <p class="hero-desc">Building <em>Goa's startup ecosystem</em> from the ground up — one founder, one school, one idea at a time. Committed to transforming Goa into a global hub for technology, education, and deep innovation by 2030.</p>
+      <div class="hero-actions">
+        <a href="#vision" class="btn-primary">Explore the Vision</a>
+        <a href="#connect" class="btn-outline">Let's Connect</a>
+      </div>
+      <div class="hero-location">Panaji, Goa · India · Active</div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-stat-card"><div class="stat-num">100<sup>+</sup></div><div class="stat-label">Startups to Fund by 2030</div><div class="stat-sub">Goa-based, globally competing companies</div></div>
+      <div class="hero-stat-card"><div class="stat-num">₹1K<sup>Cr</sup></div><div class="stat-label">Capital to Deploy</div><div class="stat-sub">Angel & VC funding in Goa ventures</div></div>
+      <div class="hero-stat-card"><div class="stat-num">3</div><div class="stat-label">Goa Unicorns by 2030</div><div class="stat-sub">Companies tracing their origin to this state</div></div>
+    </div>
+  </div>
+  <div class="hero-scroll"><div class="scroll-text">Scroll</div><div class="scroll-line"></div></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" style="padding:120px 0;background:var(--white);overflow:hidden">
+  <div class="container">
+    <div class="about-grid">
+      <div class="reveal">
+        <div class="about-image-block">
+          <div class="about-image-placeholder"><div class="about-initials">JP</div></div>
+          <div class="about-image-badge">Entrepreneur · Goa</div>
+          <div class="about-image-line"></div>
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow reveal">About Jayesh</div>
+        <h2 class="about-title reveal reveal-delay-1">Engineer by training.<br><em>Builder by calling.</em></h2>
+        <p class="about-text reveal reveal-delay-2">Jayesh Parab is a Goa-based entrepreneur, investor, and engineer whose work sits at the intersection of technology, education, and community development. His career spans building products, backing founders, and building institutions that outlast any single company.</p>
+        <p class="about-text reveal reveal-delay-2">What began as engineering discipline has evolved into a broader conviction: that <strong>Goa's geography, culture, and talent</strong> are not limitations — they are competitive advantages waiting to be deployed.</p>
+        <div class="about-pillars reveal reveal-delay-3">
+          <div class="about-pillar"><div class="pillar-icon">⚙️</div><div class="pillar-title">Engineering</div><div class="pillar-text">First-principles thinking applied to every challenge</div></div>
+          <div class="about-pillar"><div class="pillar-icon">🌱</div><div class="pillar-title">Investing</div><div class="pillar-text">Patient capital in the right founders, right problems</div></div>
+          <div class="about-pillar"><div class="pillar-icon">🎓</div><div class="pillar-title">Education</div><div class="pillar-text">Technology literacy in every Goan school by 2030</div></div>
+          <div class="about-pillar"><div class="pillar-icon">🌊</div><div class="pillar-title">Community</div><div class="pillar-text">Building the ecosystem so others don't build alone</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VISION -->
+<section id="vision" style="padding:120px 0;background:var(--navy);position:relative;overflow:hidden">
+  <div class="vision-bg"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="vision-header">
+      <div class="eyebrow reveal" style="justify-content:center">The Vision</div>
+      <h2 class="vision-title reveal reveal-delay-1">Five pillars of<br><em>Goa's transformation</em></h2>
+      <p class="vision-sub reveal reveal-delay-2">A comprehensive playbook for turning Goa into India's most innovative state — built on education, technology, sustainability, community, and capital.</p>
+    </div>
+    <div class="vision-pillars">
+      <div class="vision-pillar reveal"><div class="vp-num">01</div><div class="vp-icon">🎓</div><div class="vp-title">Education & Coding</div><p class="vp-text">Every school in Goa with a functioning coding lab. Every child with a foundation in computational thinking before they reach Class 10.</p><ul class="vp-bullets"><li>Coding labs in all government schools</li><li>Teacher training at scale</li><li>Goa's first K-12 tech curriculum</li></ul></div>
+      <div class="vision-pillar reveal reveal-delay-1"><div class="vp-num">02</div><div class="vp-icon">🚀</div><div class="vp-title">Startup Ecosystem</div><p class="vp-text">100+ funded startups, 3 unicorns, and Goa ranked in India's top-5 startup ecosystems by 2030. Not by announcement — by outcomes.</p><ul class="vp-bullets"><li>Angel network for Goa founders</li><li>Mentorship + capital combined</li><li>Founder community infrastructure</li></ul></div>
+      <div class="vision-pillar reveal reveal-delay-2"><div class="vp-num">03</div><div class="vp-icon">♻️</div><div class="vp-title">Sustainability</div><p class="vp-text">Goa's natural wealth is irreplaceable. Every tech venture should amplify — not erode — the environment that makes Goa worth building in.</p><ul class="vp-bullets"><li>Green-tech startups supported</li><li>Sustainable tourism innovation</li><li>Coastal & marine tech investment</li></ul></div>
+      <div class="vision-pillar reveal"><div class="vp-num">04</div><div class="vp-icon">🤝</div><div class="vp-title">Community Building</div><p class="vp-text">Founders shouldn't have to leave Goa to find their tribe. Building the networks, events, and infrastructure so the community thrives locally.</p><ul class="vp-bullets"><li>Goa Founders Network</li><li>Annual summit & demo days</li><li>Diaspora reconnection program</li></ul></div>
+      <div class="vision-pillar reveal reveal-delay-1"><div class="vp-num">05</div><div class="vp-icon">🏛️</div><div class="vp-title">Policy & Infrastructure</div><p class="vp-text">Working with government to create policies that make it easy to build, hire, and scale in Goa — without the friction founders face today.</p><ul class="vp-bullets"><li>Startup-friendly policy advocacy</li><li>Co-working & incubation spaces</li><li>Digital infrastructure push</li></ul></div>
+      <div class="vision-pillar reveal reveal-delay-2"><div class="vp-num">06</div><div class="vp-icon">💡</div><div class="vp-title">Deep Tech & R&D</div><p class="vp-text">Moving Goa beyond service companies into research, product, and deep technology — where the value and the margins are substantially higher.</p><ul class="vp-bullets"><li>University-industry bridges</li><li>Deep tech fellowship programs</li><li>IP creation & protection</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- GOA 2030 -->
+<section id="goa2030" style="padding:120px 0;background:var(--off)">
+  <div class="container">
+    <div class="goa-grid">
+      <div>
+        <div class="eyebrow reveal">The Mission</div>
+        <h2 class="goa-title reveal reveal-delay-1">Goa 2030:<br><em>A seaport for ideas</em></h2>
+        <p class="goa-text reveal reveal-delay-2">By 2030, Jayesh Parab's mission is measurable: Goa ranked among India's top-5 startup ecosystems, with a generation of founders who built world-class companies without leaving the state they call home.</p>
+        <p class="goa-text reveal reveal-delay-2">This is not a campaign. It is a construction project — built through education, infrastructure, policy, community, and patient capital deployed in the right hands at the right time.</p>
+        <div class="goa-belief reveal reveal-delay-3"><p class="goa-belief-text">"A seaport for ideas — not just ships. Goa has always connected India to the world. Now it is time for Goa's ideas to make that journey."</p><div class="goa-belief-attr">— Jayesh Parab · The Core Belief</div></div>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <div class="eyebrow" style="margin-top:0">By 2030</div>
+        <div class="goa-milestones">
+          <div class="milestone"><div class="milestone-num">100<span>+</span></div><div><div class="milestone-label">Funded Startups</div><div class="milestone-sub">Goa-based, globally competing companies</div></div></div>
+          <div class="milestone"><div class="milestone-num">3</div><div><div class="milestone-label">Unicorns from Goa</div><div class="milestone-sub">Companies that trace their origin to this state</div></div></div>
+          <div class="milestone"><div class="milestone-num">₹1K<span>Cr</span></div><div><div class="milestone-label">Capital Deployed</div><div class="milestone-sub">Angel and VC funding in Goa-based ventures</div></div></div>
+          <div class="milestone"><div class="milestone-num">Every</div><div><div class="milestone-label">School with a Coding Lab</div><div class="milestone-sub">Technology education reaching every Goan child</div></div></div>
+          <div class="milestone"><div class="milestone-num">Top<span> 5</span></div><div><div class="milestone-label">Indian Startup Ecosystem</div><div class="milestone-sub">A rank earned through outcomes, not announcements</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CREDO -->
+<section id="credo" style="padding:100px 0;background:var(--navy2);text-align:center;position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(26,58,92,.6) 0%,transparent 70%)"></div>
+  <div class="container">
+    <div class="credo-inner reveal">
+      <span class="credo-big-quote">"</span>
+      <p class="credo-text">Innovation does not need a big city. It needs a clear mind, a real problem, and a community that believes in what is being built.</p>
+      <div class="credo-divider"></div>
+      <div class="credo-author">Jayesh Parab · Goa, India</div>
+      <div class="credo-chips">
+        <span class="credo-chip">Engineer First</span>
+        <span class="credo-chip">Builder Always</span>
+        <span class="credo-chip">Goa Believer</span>
+        <span class="credo-chip">Long-Term Thinker</span>
+        <span class="credo-chip">Founder's Friend</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOG -->
+<section id="blog" style="padding:120px 0;background:var(--white)">
+  <div class="container">
+    <div class="blog-header">
+      <div>
+        <div class="eyebrow reveal">Insights & Ideas</div>
+        <h2 class="blog-title reveal reveal-delay-1">From the<br><em>desk of Jayesh</em></h2>
+      </div>
+      <a href="#blog" class="blog-all-link reveal reveal-delay-2">View All Articles →</a>
+    </div>
+
+    <!-- Featured -->
+    <div class="blog-featured reveal">
+      <div class="bf-image">
+        <div class="bf-pattern"></div>
+        <div class="bf-image-overlay"></div>
+        <span class="bf-category">Startup Ecosystem</span>
+      </div>
+      <div class="bf-content">
+        <div>
+          <div class="bf-meta">April 8, 2026 · 8 min read · Featured</div>
+          <a href="#" class="bf-title">Why Goa Will Produce India's Next Unicorn — And Why Nobody Sees It Coming</a>
+          <p class="bf-excerpt">Every major investor looks at Bangalore, Mumbai, Delhi-NCR. Nobody is watching Goa. That asymmetry — between perceived opportunity and actual talent density — is exactly the kind of arbitrage that produces unicorns. Here's the data, the thesis, and the 2030 roadmap.</p>
+        </div>
+        <a href="#" class="bf-read">Read Full Article →</a>
+      </div>
+    </div>
+
+    <!-- Row 1: 3 cards -->
+    <div class="blog-grid">
+      <a href="#" class="blog-card reveal">
+        <div class="bc-image" style="background:linear-gradient(135deg,#0f2640,#1e4168)"><div class="bc-image-inner">🎓</div><span class="bc-cat">Education</span></div>
+        <div class="bc-content"><div class="bc-meta"><span>Apr 7</span><span>6 min</span></div><div class="bc-title">Coding Labs in Every Goa School: The Full Blueprint</div><p class="bc-excerpt">How we plan to equip 1,200+ government schools with functional coding infrastructure — curriculum, teachers, hardware, and funding model included.</p></div>
+      </a>
+      <a href="#" class="blog-card reveal reveal-delay-1">
+        <div class="bc-image" style="background:linear-gradient(135deg,#0e4a3a,#0e9e87)"><div class="bc-image-inner">🌊</div><span class="bc-cat">Sustainability</span></div>
+        <div class="bc-content"><div class="bc-meta"><span>Apr 6</span><span>5 min</span></div><div class="bc-title">Green Tech Startups in Goa: The $500M Opportunity Nobody Is Funding</div><p class="bc-excerpt">Goa's coastline, biodiversity, and tourism economy create a unique canvas for environmental technology. Meet the founders already building here.</p></div>
+      </a>
+      <a href="#" class="blog-card reveal reveal-delay-2">
+        <div class="bc-image" style="background:linear-gradient(135deg,#3a2a0a,#b8893a)"><div class="bc-image-inner">💰</div><span class="bc-cat">Investing</span></div>
+        <div class="bc-content"><div class="bc-meta"><span>Apr 5</span><span>7 min</span></div><div class="bc-title">Angel Investing in Tier-2 India: My Investment Framework for Goa Founders</div><p class="bc-excerpt">After backing 30+ early-stage founders, here are the 8 signals I look for — and why geography is increasingly irrelevant to company quality.</p></div>
+      </a>
+    </div>
+
+    <!-- Row 2: 4 mini cards -->
+    <div class="blog-grid-4">
+      <a href="#" class="blog-card-mini reveal"><div class="bcm-cat">Policy</div><div class="bcm-title">The One Policy Change That Would Triple Goa's Startup Count Overnight</div><div class="bcm-meta">Apr 4 · 4 min read</div></a>
+      <a href="#" class="blog-card-mini reveal reveal-delay-1"><div class="bcm-cat">Community</div><div class="bcm-title">Building the Goa Founders Network: What Worked, What Didn't, What's Next</div><div class="bcm-meta">Apr 3 · 5 min read</div></a>
+      <a href="#" class="blog-card-mini reveal reveal-delay-2"><div class="bcm-cat">Deep Tech</div><div class="bcm-title">Why Goa's Universities Are Sitting on a Goldmine of Untapped Research IP</div><div class="bcm-meta">Apr 2 · 6 min read</div></a>
+      <a href="#" class="blog-card-mini reveal reveal-delay-3"><div class="bcm-cat">Tourism Tech</div><div class="bcm-title">How AI Is Reinventing Goa's ₹35,000 Crore Tourism Industry From the Inside</div><div class="bcm-meta">Apr 1 · 5 min read</div></a>
+    </div>
+
+    <!-- Row 3: 3 cards -->
+    <div class="blog-grid">
+      <a href="#" class="blog-card reveal">
+        <div class="bc-image" style="background:linear-gradient(135deg,#1a1a3e,#2d2d7a)"><div class="bc-image-inner">🤖</div><span class="bc-cat">AI & Future</span></div>
+        <div class="bc-content"><div class="bc-meta"><span>Mar 31</span><span>8 min</span></div><div class="bc-title">How Goa Can Become India's AI Capital Without Competing With Bangalore</div><p class="bc-excerpt">Differentiation, not competition. Goa's path to becoming an AI hub runs through niche verticals — tourism, marine, agritech — where Bangalore isn't looking.</p></div>
+      </a>
+      <a href="#" class="blog-card reveal reveal-delay-1">
+        <div class="bc-image" style="background:linear-gradient(135deg,#2a0a2a,#7a1a7a)"><div class="bc-image-inner">👩‍💼</div><span class="bc-cat">Women Founders</span></div>
+        <div class="bc-content"><div class="bc-meta"><span>Mar 30</span><span>6 min</span></div><div class="bc-title">Women Entrepreneurs in Goa: The Invisible Pipeline the Ecosystem Must Unlock</div><p class="bc-excerpt">Goa has a disproportionately high rate of women-led small businesses. The opportunity to turn them into scalable companies is hiding in plain sight.</p></div>
+      </a>
+      <a href="#" class="blog-card reveal reveal-delay-2">
+        <div class="bc-image" style="background:linear-gradient(135deg,#0a2a1a,#1a6a3a)"><div class="bc-image-inner">🌏</div><span class="bc-cat">Global Vision</span></div>
+        <div class="bc-content"><div class="bc-meta"><span>Mar 29</span><span>7 min</span></div><div class="bc-title">The Goa Diaspora Network: How 2 Million Goans Abroad Can Fund the Homeland Economy</div><p class="bc-excerpt">NRI capital, global networks, local roots. The Goan diaspora is the most underutilized development resource the state has. Here's the playbook to activate it.</p></div>
+      </a>
+    </div>
+
+    <!-- CTA bar -->
+    <div class="blog-cta-bar reveal">
+      <div><div class="blog-cta-text">Get fresh insights <span>every week</span></div><div class="blog-cta-sub">10 new articles weekly on startups, investing, education & Goa's future</div></div>
+      <a href="#connect" class="btn-primary">Subscribe to the Newsletter</a>
+    </div>
+  </div>
+</section>
+
+<!-- CONNECT -->
+<section id="connect" style="padding:120px 0;background:var(--off)">
+  <div class="container">
+    <div class="connect-grid">
+      <div>
+        <div class="eyebrow reveal">Get in Touch</div>
+        <h2 class="connect-title reveal reveal-delay-1">Let's build<br><em>together.</em></h2>
+        <p class="connect-desc reveal reveal-delay-2">Whether you are a founder building in Goa, an entrepreneur looking to connect with the ecosystem, an educator with ideas for Goa's youth, or an investor who shares this vision — this conversation matters.</p>
+        <div class="connect-ways reveal reveal-delay-3">
+          <a href="https://www.instagram.com/jayeshparab_goa" class="connect-way" target="_blank" rel="noopener"><div class="cw-icon">📸</div><div><div class="cw-label">Instagram</div><div class="cw-value">@jayeshparab_goa</div></div></a>
+          <a href="https://www.linkedin.com/in/jayesh-parab-687163400/" class="connect-way" target="_blank" rel="noopener"><div class="cw-icon">💼</div><div><div class="cw-label">LinkedIn</div><div class="cw-value">Jayesh Parab · Entrepreneur, Goa</div></div></a>
+          <a href="#" class="connect-way"><div class="cw-icon">📍</div><div><div class="cw-label">Location</div><div class="cw-value">Panaji, Goa · India</div></div></a>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <form class="connect-form" action="https://formspree.io/f/xnjorgbn" method="POST">
+          <input type="hidden" name="_subject" value="New message from jayeshparab.com">
+          <input type="hidden" name="_replyto" id="reply-field">
+          <input type="text" name="_gotcha" style="display:none">
+          <div class="form-row">
+            <div class="form-group"><label for="name">Your Name</label><input type="text" id="name" name="name" placeholder="Full name" required></div>
+            <div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email" placeholder="you@example.com" required oninput="document.getElementById('reply-field').value=this.value"></div>
+          </div>
+          <div class="form-group">
+            <label for="context">I am a...</label>
+            <select id="context" name="I am a">
+              <option value="">Select your role</option>
+              <option>Founder building in Goa</option>
+              <option>Entrepreneur looking to connect</option>
+              <option>Educator with ideas for Goa</option>
+              <option>Investor who shares this vision</option>
+              <option>Student or young builder</option>
+              <option>Government or policy maker</option>
+              <option>Journalist or researcher</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label for="message">What's on your mind?</label><textarea id="message" name="message" placeholder="Tell me what you are building, thinking about, or want to discuss..." required></textarea></div>
+          <button type="submit" class="form-submit">Send Message →</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-logo">Jayesh <span>Parab</span></div>
+      <p class="footer-tagline">Entrepreneur · Investor · Engineer<br>Building Goa 2030, one founder at a time.</p>
+      <div class="footer-socials">
+        <a href="https://www.instagram.com/jayeshparab_goa" class="social-link" target="_blank" rel="noopener">📸</a>
+        <a href="https://www.linkedin.com/in/jayesh-parab-687163400/" class="social-link" target="_blank" rel="noopener">💼</a>
+        <a href="#" class="social-link">𝕏</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Navigate</div>
+      <div class="footer-links">
+        <a href="#about" class="footer-link">About</a>
+        <a href="#vision" class="footer-link">Vision</a>
+        <a href="#goa2030" class="footer-link">Goa 2030</a>
+        <a href="#blog" class="footer-link">Blog</a>
+        <a href="#connect" class="footer-link">Connect</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Blog Topics</div>
+      <div class="footer-links">
+        <a href="#blog" class="footer-link">Startup Ecosystem</a>
+        <a href="#blog" class="footer-link">Education & Coding</a>
+        <a href="#blog" class="footer-link">Angel Investing</a>
+        <a href="#blog" class="footer-link">Sustainability</a>
+        <a href="#blog" class="footer-link">Policy & Advocacy</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Contact</div>
+      <div class="footer-links">
+        <a href="#connect" class="footer-link">Send a Message</a>
+        <a href="https://www.linkedin.com/in/jayesh-parab-687163400/" class="footer-link" target="_blank">LinkedIn Profile</a>
+        <a href="https://www.instagram.com/jayeshparab_goa" class="footer-link" target="_blank">Instagram</a>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:var(--max-w);margin:0 auto">
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 Jayesh Parab · Panaji, Goa · India</div>
+      <div class="footer-copy">Hosted on GitHub Pages</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const nav=document.getElementById('main-nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>60));
+const hamburger=document.getElementById('hamburger');
+const mobileMenu=document.getElementById('mobile-menu');
+document.querySelectorAll('.mobile-link').forEach(l=>l.addEventListener('click',()=>{mobileMenu.classList.remove('open');document.body.style.overflow=''}));
+hamburger.addEventListener('click',()=>{mobileMenu.classList.add('open');document.body.style.overflow='hidden'});
+document.getElementById('mobile-close').addEventListener('click',()=>{mobileMenu.classList.remove('open');document.body.style.overflow=''});
+const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(r=>observer.observe(r));
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}}));
+</script>
+</body>
+</html>
