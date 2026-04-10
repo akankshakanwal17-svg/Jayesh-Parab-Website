@@ -1,336 +1,1092 @@
-"""
-generate_blogs.py  v2  — with verbose logging so you can debug in GitHub Actions
-"""
-
-import anthropic
-import json
-import os
-import re
-import sys
-from datetime import datetime
-from pathlib import Path
-
-# ─── CONFIG ───────────────────────────────────────────────────────────────────
-
-BLOG_DIR   = Path("blog/posts")
-INDEX_FILE = Path("blog/index.html")
-TODAY      = datetime.now()
-DATE_STR   = TODAY.strftime("%Y-%m-%d")
-DATE_NICE  = TODAY.strftime("%d %B %Y")
-
-TOPIC_BUCKETS = [
-    "Goa's startup ecosystem and investment climate in 2025–2030",
-    "Clean energy and CleanTech innovations in coastal India",
-    "EdTech trends transforming education in tier-2 and tier-3 Indian cities",
-    "Real estate development and smart city planning in Goa",
-    "Pharmaceutical innovation and India's role in global healthcare",
-    "Technology leadership and the future of AI in Indian businesses",
-    "Sustainable tourism and eco-friendly business models in Goa",
-    "Entrepreneurship lessons and building startups from scratch in India",
-    "International trade, exports, and India's growing global footprint",
-    "Environmental policy, carbon credits, and green finance in India",
-]
-
-SYSTEM_PROMPT = """You are an expert content writer for Jayesh Parab — a Goa-based entrepreneur,
-investor and visionary working across Technology, CleanTech, Real Estate, EdTech, Pharma and Trade.
-His personal website is jayeshparab.com.
-
-Write each blog post in his authoritative yet approachable voice.
-Blogs should be insightful, data-rich, and forward-looking.
-Always write from a Goa / India perspective when relevant.
-
-Respond ONLY with a JSON object — no markdown fences, no preamble.
-"""
-
-POST_PROMPT = """Write a detailed, SEO-optimised blog post on this topic:
-
-TOPIC: {topic}
-DATE:  {date}
-SLUG:  {slug}
-
-Return ONLY a valid JSON object with these exact keys:
-{{
-  "title":       "Compelling 60-char max title",
-  "slug":        "{slug}",
-  "date":        "{date}",
-  "category":    "One of: Technology | CleanTech | EdTech | Real Estate | Pharma | Trade | Entrepreneurship | Goa 2030",
-  "excerpt":     "160-char SEO meta description",
-  "read_time":   "X min read",
-  "keywords":    ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
-  "body_html":   "Full blog body as HTML — use <h2>, <h3>, <p>, <ul>, <li>, <strong> only. Min 900 words. No inline styles."
-}}
-"""
-
-# ─── HELPERS ──────────────────────────────────────────────────────────────────
-
-def log(msg): print(msg, flush=True)
-
-def slugify(text):
-    text = text.lower()
-    text = re.sub(r"[^a-z0-9\s-]", "", text)
-    text = re.sub(r"\s+", "-", text.strip())
-    return text[:60]
-
-def safe_json(raw):
-    raw = raw.strip()
-    raw = re.sub(r"^```json\s*", "", raw)
-    raw = re.sub(r"\s*```$",    "", raw)
-    return json.loads(raw)
-
-def generate_post(client, topic, idx):
-    slug   = f"{DATE_STR}-blog-{idx+1:02d}"
-    prompt = POST_PROMPT.format(topic=topic, date=DATE_NICE, slug=slug)
-    try:
-        log(f"    Calling Claude API for post {idx+1}...")
-        msg = client.messages.create(
-            model      = "claude-sonnet-4-20250514",
-            max_tokens = 2500,
-            system     = SYSTEM_PROMPT,
-            messages   = [{"role": "user", "content": prompt}],
-        )
-        raw  = msg.content[0].text
-        log(f"    Response received ({len(raw)} chars). Parsing JSON...")
-        data = safe_json(raw)
-        data["slug"]     = slug
-        data["date_raw"] = DATE_STR
-        log(f"    ✓ Parsed: {data.get('title','')[:60]}")
-        return data
-    except anthropic.AuthenticationError:
-        log("  ✗ AUTHENTICATION ERROR — Your ANTHROPIC_API_KEY is invalid or missing.")
-        log("    Fix: Go to GitHub repo → Settings → Secrets → Actions → check ANTHROPIC_API_KEY")
-        return None
-    except anthropic.RateLimitError:
-        log("  ✗ RATE LIMIT — Too many requests. Will retry tomorrow.")
-        return None
-    except json.JSONDecodeError as e:
-        log(f"  ✗ JSON parse error: {e}")
-        return None
-    except Exception as e:
-        log(f"  ✗ Unexpected error: {type(e).__name__}: {e}")
-        return None
-
-# ─── HTML TEMPLATES ───────────────────────────────────────────────────────────
-
-def post_html(p):
-    keywords_meta = ", ".join(p.get("keywords", []))
-    return f"""<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{p['title']} | Jayesh Parab</title>
-  <meta name="description"       content="{p['excerpt']}">
-  <meta name="keywords"          content="{keywords_meta}">
-  <meta name="author"            content="Jayesh Parab">
-  <meta property="og:title"      content="{p['title']}">
-  <meta property="og:description"content="{p['excerpt']}">
-  <meta property="og:url"        content="https://jayeshparab.com/blog/posts/{p['slug']}.html">
-  <meta property="og:type"       content="article">
-  <link rel="canonical"          href="https://jayeshparab.com/blog/posts/{p['slug']}.html">
+  <title>Jayesh Parab — Entrepreneur, Investor & Visionary | Goa</title>
+  <meta name="description" content="Jayesh Parab — Goa-based entrepreneur and investor working across Technology, CleanTech, Real Estate, EdTech, Pharma and Trade. Building Goa 2030.">
+  <meta name="keywords" content="Jayesh Parab, Goa entrepreneur, startup investor, CleanTech India, Goa 2030">
+  <meta property="og:title" content="Jayesh Parab — Entrepreneur & Investor">
+  <meta property="og:description" content="Goa-based entrepreneur and investor working across Technology, CleanTech, Real Estate, EdTech, Pharma and Trade.">
+  <meta property="og:url" content="https://jayeshparab.com">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://jayeshparab.com">
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
   <style>
-    :root{{--navy:#061427;--gold:#C49A3C;--white:#FFFFFF;--muted:rgba(255,255,255,0.55);--border:rgba(196,154,60,0.25);}}
-    *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0;}}
-    html{{scroll-behavior:smooth;}}
-    body{{background:var(--navy);color:var(--white);font-family:'Outfit',sans-serif;font-size:17px;line-height:1.8;}}
-    nav{{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(6,20,39,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 5%;height:64px;display:flex;align-items:center;justify-content:space-between;}}
-    .nav-logo{{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--gold);text-decoration:none;letter-spacing:.03em;}}
-    .nav-links{{display:flex;gap:2rem;list-style:none;}}
-    .nav-links a{{color:var(--muted);text-decoration:none;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;transition:color .2s;}}
-    .nav-links a:hover{{color:var(--gold);}}
-    .post-hero{{margin-top:64px;padding:64px 5% 48px;border-bottom:1px solid var(--border);}}
-    .post-meta{{display:flex;gap:1.5rem;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;}}
-    .category-pill{{background:rgba(196,154,60,.15);border:1px solid var(--gold);color:var(--gold);font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:4px 14px;border-radius:100px;}}
-    .post-date,.post-read{{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);letter-spacing:.06em;}}
-    .post-title{{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:700;line-height:1.2;color:var(--white);margin-bottom:1.25rem;}}
-    .post-excerpt{{font-size:1.1rem;color:var(--muted);max-width:680px;line-height:1.7;}}
-    .post-body{{max-width:760px;margin:0 auto;padding:56px 5% 80px;}}
-    .post-body h2{{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:700;color:var(--white);margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);}}
-    .post-body h3{{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:var(--gold);margin:1.8rem 0 .75rem;}}
-    .post-body p{{margin-bottom:1.2rem;color:rgba(255,255,255,.85);}}
-    .post-body strong{{color:var(--gold);font-weight:600;}}
-    .post-body ul{{margin:1rem 0 1.5rem 1.5rem;}}
-    .post-body li{{color:rgba(255,255,255,.82);margin-bottom:.5rem;line-height:1.7;}}
-    .post-body li::marker{{color:var(--gold);}}
-    .keywords-row{{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:2rem;padding-top:2rem;border-top:1px solid var(--border);}}
-    .kw-tag{{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.08em;color:var(--muted);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);padding:4px 12px;border-radius:100px;}}
-    .back-btn{{display:inline-flex;align-items:center;gap:.5rem;color:var(--gold);text-decoration:none;font-size:.85rem;letter-spacing:.06em;font-family:'DM Mono',monospace;margin-bottom:2.5rem;transition:opacity .2s;}}
-    .back-btn:hover{{opacity:.7;}}
-    footer{{text-align:center;padding:2.5rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--muted);font-family:'DM Mono',monospace;}}
-    footer a{{color:var(--gold);text-decoration:none;}}
+    /* ── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --navy:    #061427;
+      --navy2:   #0a1f3a;
+      --gold:    #C49A3C;
+      --gold2:   #D4AA4C;
+      --white:   #FFFFFF;
+      --offwhite:#F5F0E8;
+      --muted:   rgba(255,255,255,0.55);
+      --muted2:  rgba(255,255,255,0.35);
+      --border:  rgba(196,154,60,0.22);
+      --border2: rgba(255,255,255,0.08);
+    }
+
+    /* ── RESET ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    /* ── NAV ────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: rgba(6,20,39,0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      height: 64px;
+      display: flex; align-items: center;
+      padding: 0 5%;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.06em;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2.2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-family: 'DM Mono', monospace;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-links a.blog-link {
+      color: var(--gold);
+      border: 1px solid var(--border);
+      padding: 5px 14px;
+      border-radius: 100px;
+    }
+    .nav-links a.blog-link:hover {
+      background: rgba(196,154,60,0.12);
+    }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 64px; left: 0; right: 0;
+      background: rgba(6,20,39,0.97);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 5%;
+      z-index: 999;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .mobile-menu a {
+      color: var(--muted);
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-family: 'DM Mono', monospace;
+      transition: color 0.2s;
+    }
+    .mobile-menu a:hover { color: var(--gold); }
+    .mobile-menu.open { display: flex; }
+
+    /* ── HERO ───────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center;
+      padding: 100px 5% 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: -20%; right: -10%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(196,154,60,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+    .hero-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.2rem, 8vw, 7rem);
+      font-weight: 700;
+      line-height: 1.0;
+      color: var(--white);
+      letter-spacing: -0.01em;
+      margin-bottom: 1.5rem;
+    }
+    .hero-name span { color: var(--gold); }
+    .hero-tagline {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+    .stat-item {}
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+    .hero-quote-card {
+      max-width: 520px;
+      border-left: 2px solid var(--gold);
+      padding: 1.2rem 1.5rem;
+      background: rgba(196,154,60,0.06);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 2.5rem;
+    }
+    .hero-quote-card p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-style: italic;
+      color: var(--offwhite);
+      line-height: 1.7;
+    }
+    .location-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 100px;
+    }
+    .location-badge::before {
+      content: '◉';
+      color: var(--gold);
+      font-size: 0.6rem;
+    }
+    .hero-cta {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      margin-top: 2.5rem;
+    }
+    .btn-primary {
+      background: var(--gold);
+      color: var(--navy);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { background: var(--gold2); transform: translateY(-1px); }
+    .btn-outline {
+      border: 1px solid var(--border);
+      color: var(--white);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      border-radius: 4px;
+      transition: border-color 0.2s, color 0.2s, transform 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); }
+
+    /* ── SECTION SHARED ─────────────────────────────────── */
+    section {
+      padding: 100px 5%;
+    }
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+    }
+    .section-subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 560px;
+      line-height: 1.75;
+      margin-bottom: 3rem;
+    }
+    .divider {
+      width: 48px; height: 1px;
+      background: var(--gold);
+      margin: 1.5rem 0 2.5rem;
+    }
+
+    /* ── ABOUT ──────────────────────────────────────────── */
+    #about .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .portrait-frame {
+      width: 100%;
+      aspect-ratio: 3/4;
+      max-width: 380px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--navy2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .portrait-initials {
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      font-weight: 700;
+      color: rgba(196,154,60,0.15);
+      user-select: none;
+    }
+    .portrait-frame::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 40%;
+      background: linear-gradient(to top, var(--navy2), transparent);
+    }
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+    }
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 1.5rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border2);
+    }
+    .timeline-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .timeline-year {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      padding-top: 0.2rem;
+    }
+    .timeline-content h4 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.3rem;
+    }
+    .timeline-content p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 2rem;
+    }
+    .skill-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border: 1px solid var(--border2);
+      padding: 5px 12px;
+      border-radius: 100px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .skill-tag:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── VISION ─────────────────────────────────────────── */
+    #vision { background: var(--navy2); }
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+    .pillar-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem 1.5rem;
+      transition: border-color 0.25s, transform 0.25s, background 0.25s;
+    }
+    .pillar-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-4px);
+      background: rgba(196,154,60,0.05);
+    }
+    .pillar-icon {
+      font-size: 1.5rem;
+      margin-bottom: 1.2rem;
+    }
+    .pillar-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .pillar-desc {
+      font-size: 0.87rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── PORTFOLIO ───────────────────────────────────────── */
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .portfolio-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+    .portfolio-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transition: transform 0.3s;
+    }
+    .portfolio-card:hover::before { transform: scaleX(1); }
+    .portfolio-card:hover { border-color: rgba(196,154,60,0.4); transform: translateY(-3px); }
+    .portfolio-sector {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+    .portfolio-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+    .portfolio-desc {
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ── GOA 2030 ────────────────────────────────────────── */
+    #goa2030 { background: var(--navy2); }
+    .milestones-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1.5rem;
+    }
+    .milestone-card {
+      border-top: 2px solid var(--gold);
+      padding: 1.5rem 0;
+    }
+    .milestone-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .milestone-label {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── BLOG PREVIEW ────────────────────────────────────── */
+    #blog-preview {
+      background: var(--navy);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .blog-preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+    .blog-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .blog-preview-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color 0.25s, transform 0.25s;
+      text-decoration: none;
+    }
+    .blog-preview-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-3px);
+    }
+    .blog-preview-card .bp-meta {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .bp-category {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(196,154,60,0.1);
+      border: 1px solid rgba(196,154,60,0.3);
+      padding: 2px 10px;
+      border-radius: 100px;
+    }
+    .bp-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted2);
+    }
+    .bp-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--white);
+      flex: 1;
+    }
+    .bp-excerpt {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .bp-read {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--gold);
+      letter-spacing: 0.06em;
+      margin-top: auto;
+    }
+    .blog-preview-placeholder {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 4rem;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+    }
+    .view-all-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 12px 28px;
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+    }
+    .view-all-btn:hover {
+      background: var(--gold);
+      color: var(--navy);
+      transform: translateY(-1px);
+    }
+
+    /* ── CREDO ───────────────────────────────────────────── */
+    #credo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 50vh;
+      background: var(--navy2);
+    }
+    .credo-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+      font-style: italic;
+      font-weight: 600;
+      line-height: 1.5;
+      max-width: 800px;
+      color: var(--white);
+      margin-bottom: 2rem;
+    }
+    .credo-attr {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* ── CONNECT ─────────────────────────────────────────── */
+    #connect {}
+    .connect-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .connect-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .form-group label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      padding: 12px 14px;
+      color: var(--white);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+      outline: none;
+      resize: vertical;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--gold);
+    }
+    .form-group select option { background: var(--navy2); }
+    .form-group textarea { min-height: 120px; }
+    .form-submit {
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      padding: 14px 32px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      margin-top: 0.5rem;
+    }
+    .form-submit:hover { background: var(--gold2); transform: translateY(-1px); }
+    .connect-info { }
+    .connect-intro {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.75;
+      margin-bottom: 2.5rem;
+    }
+    .social-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.2rem;
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .social-link:hover {
+      border-color: var(--gold);
+      background: rgba(196,154,60,0.06);
+    }
+    .social-platform {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      min-width: 90px;
+    }
+    .social-handle {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* ── FOOTER ──────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .footer-copy {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: var(--muted2);
+    }
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+    .footer-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+
+    /* ── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .pillars-grid { grid-template-columns: repeat(2, 1fr); }
+      .milestones-grid { grid-template-columns: repeat(3, 1fr); }
+      .blog-preview-grid { grid-template-columns: repeat(2, 1fr); }
+      .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      section { padding: 70px 5%; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      #about .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .pillars-grid { grid-template-columns: 1fr; }
+      .milestones-grid { grid-template-columns: repeat(2, 1fr); }
+      .portfolio-grid { grid-template-columns: 1fr; }
+      .blog-preview-grid { grid-template-columns: 1fr; }
+      .connect-grid { grid-template-columns: 1fr; gap: 3rem; }
+      footer { flex-direction: column; text-align: center; }
+      .hero-stats { gap: 2rem; }
+    }
   </style>
 </head>
 <body>
+
+  <!-- NAV -->
   <nav>
     <a href="/" class="nav-logo">JP</a>
     <ul class="nav-links">
-      <li><a href="/">Home</a></li>
-      <li><a href="/blog/">Blog</a></li>
-      <li><a href="/#connect">Connect</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#vision">Vision</a></li>
+      <li><a href="#portfolio">Portfolio</a></li>
+      <li><a href="#goa2030">Goa 2030</a></li>
+      <li><a href="/blog/" class="blog-link">Blog</a></li>
+      <li><a href="#connect">Connect</a></li>
     </ul>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
   </nav>
-  <section class="post-hero">
-    <div class="post-meta">
-      <span class="category-pill">{p['category']}</span>
-      <span class="post-date">{p['date']}</span>
-      <span class="post-read">{p['read_time']}</span>
-    </div>
-    <h1 class="post-title">{p['title']}</h1>
-    <p class="post-excerpt">{p['excerpt']}</p>
-  </section>
-  <article class="post-body">
-    <a href="/blog/" class="back-btn">&#8592; All Posts</a>
-    {p['body_html']}
-    <div class="keywords-row">
-      {"".join(f'<span class="kw-tag">{k}</span>' for k in p.get("keywords",[]))}
-    </div>
-  </article>
-  <footer>
-    <p>&copy; {TODAY.year} <a href="/">Jayesh Parab</a> &mdash; Goa, India</p>
-  </footer>
-</body>
-</html>"""
 
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#about" onclick="closeMenu()">About</a>
+    <a href="#vision" onclick="closeMenu()">Vision</a>
+    <a href="#portfolio" onclick="closeMenu()">Portfolio</a>
+    <a href="#goa2030" onclick="closeMenu()">Goa 2030</a>
+    <a href="/blog/">Blog</a>
+    <a href="#connect" onclick="closeMenu()">Connect</a>
+  </div>
 
-def index_html(all_posts):
-    all_posts_sorted = sorted(all_posts, key=lambda x: x.get("date_raw",""), reverse=True)
-    cards = ""
-    for p in all_posts_sorted:
-        cards += f"""
-    <article class="blog-card">
-      <div class="card-meta">
-        <span class="category-pill">{p['category']}</span>
-        <span class="card-date">{p['date']}</span>
-        <span class="card-read">{p['read_time']}</span>
+  <!-- HERO -->
+  <section id="hero">
+    <span class="hero-label">Entrepreneur · Investor · Visionary</span>
+    <h1 class="hero-name">Jayesh<br><span>Parab</span></h1>
+    <div class="hero-quote-card">
+      <p>"Building ventures that bridge capital, conscience, and community — one decision at a time."</p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-number">15+</div>
+        <div class="stat-label">Years Experience</div>
       </div>
-      <h2 class="card-title">
-        <a href="/blog/posts/{p['slug']}.html">{p['title']}</a>
-      </h2>
-      <p class="card-excerpt">{p['excerpt']}</p>
-      <a href="/blog/posts/{p['slug']}.html" class="read-more">Read Article &#8594;</a>
-    </article>"""
-    total = len(all_posts_sorted)
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blog | Jayesh Parab</title>
-  <meta name="description" content="Insights on Technology, CleanTech, EdTech, Real Estate, and Goa's future by Jayesh Parab.">
-  <link rel="canonical" href="https://jayeshparab.com/blog/">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    :root{{--navy:#061427;--gold:#C49A3C;--white:#FFFFFF;--muted:rgba(255,255,255,0.55);--border:rgba(196,154,60,0.25);}}
-    *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0;}}
-    body{{background:var(--navy);color:var(--white);font-family:'Outfit',sans-serif;}}
-    nav{{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(6,20,39,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 5%;height:64px;display:flex;align-items:center;justify-content:space-between;}}
-    .nav-logo{{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--gold);text-decoration:none;}}
-    .nav-links{{display:flex;gap:2rem;list-style:none;}}
-    .nav-links a{{color:var(--muted);text-decoration:none;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;transition:color .2s;}}
-    .nav-links a:hover{{color:var(--gold);}}
-    .page-hero{{margin-top:64px;padding:80px 5% 60px;border-bottom:1px solid var(--border);}}
-    .hero-label{{font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;display:block;}}
-    .hero-title{{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,6vw,4rem);font-weight:700;line-height:1.1;margin-bottom:1rem;}}
-    .hero-subtitle{{color:var(--muted);font-size:1.05rem;max-width:560px;}}
-    .post-count{{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);margin-top:1.5rem;letter-spacing:.08em;}}
-    .blog-grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem;padding:48px 5% 80px;max-width:1400px;margin:0 auto;}}
-    .blog-card{{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:2rem;transition:border-color .25s,transform .25s;display:flex;flex-direction:column;gap:.85rem;}}
-    .blog-card:hover{{border-color:var(--gold);transform:translateY(-3px);}}
-    .card-meta{{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;}}
-    .category-pill{{background:rgba(196,154,60,.15);border:1px solid var(--gold);color:var(--gold);font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:100px;}}
-    .card-date,.card-read{{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);}}
-    .card-title{{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:700;line-height:1.3;}}
-    .card-title a{{color:var(--white);text-decoration:none;transition:color .2s;}}
-    .card-title a:hover{{color:var(--gold);}}
-    .card-excerpt{{color:var(--muted);font-size:.92rem;line-height:1.65;flex:1;}}
-    .read-more{{color:var(--gold);text-decoration:none;font-size:.82rem;letter-spacing:.06em;font-family:'DM Mono',monospace;transition:opacity .2s;margin-top:.5rem;}}
-    .read-more:hover{{opacity:.7;}}
-    .no-posts{{text-align:center;padding:4rem;color:var(--muted);font-family:'DM Mono',monospace;font-size:.9rem;}}
-    footer{{text-align:center;padding:2.5rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--muted);font-family:'DM Mono',monospace;}}
-    footer a{{color:var(--gold);text-decoration:none;}}
-  </style>
-</head>
-<body>
-  <nav>
-    <a href="/" class="nav-logo">JP</a>
-    <ul class="nav-links">
-      <li><a href="/">Home</a></li>
-      <li><a href="/blog/">Blog</a></li>
-      <li><a href="/#connect">Connect</a></li>
-    </ul>
-  </nav>
-  <section class="page-hero">
-    <span class="hero-label">Perspectives &amp; Insights</span>
-    <h1 class="hero-title">The Blog</h1>
-    <p class="hero-subtitle">Thoughts on Technology, CleanTech, Real Estate, EdTech, Pharma, and building a better Goa — published daily.</p>
-    <p class="post-count">{total} articles published</p>
+      <div class="stat-item">
+        <div class="stat-number">6</div>
+        <div class="stat-label">Sectors Active</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">Goa</div>
+        <div class="stat-label">Base of Operations</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">2030</div>
+        <div class="stat-label">Vision Year</div>
+      </div>
+    </div>
+    <span class="location-badge">Panaji, Goa · India</span>
+    <div class="hero-cta">
+      <a href="#portfolio" class="btn-primary">Explore Portfolio</a>
+      <a href="#connect" class="btn-outline">Get in Touch</a>
+    </div>
   </section>
-  <main class="blog-grid">
-    {cards if cards else '<p class="no-posts">No posts yet — check back soon.</p>'}
-  </main>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-grid">
+      <div class="portrait-frame">
+        <div class="portrait-initials">JP</div>
+      </div>
+      <div>
+        <span class="section-label">About</span>
+        <h2 class="section-title">Rooted in Goa.<br>Thinking Globally.</h2>
+        <div class="divider"></div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-year">2030</div>
+            <div class="timeline-content">
+              <h4>Goa 2030 Initiative</h4>
+              <p>Driving sustainable development, smart infrastructure and startup culture across Goa.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2018</div>
+            <div class="timeline-content">
+              <h4>Multi-Sector Expansion</h4>
+              <p>Broadened portfolio into CleanTech, EdTech and Pharma, with active investments across India.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2012</div>
+            <div class="timeline-content">
+              <h4>Real Estate & Trade</h4>
+              <p>Built foundations in Goa real estate and international trade corridors.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2008</div>
+            <div class="timeline-content">
+              <h4>First Venture</h4>
+              <p>Founded first enterprise in Goa, establishing deep local networks and business acumen.</p>
+            </div>
+          </div>
+        </div>
+        <div class="skills-grid">
+          <span class="skill-tag">Strategic Investment</span>
+          <span class="skill-tag">Startup Mentorship</span>
+          <span class="skill-tag">Real Estate</span>
+          <span class="skill-tag">CleanTech</span>
+          <span class="skill-tag">EdTech</span>
+          <span class="skill-tag">Pharma</span>
+          <span class="skill-tag">International Trade</span>
+          <span class="skill-tag">Policy & Governance</span>
+          <span class="skill-tag">Sustainability</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISION -->
+  <section id="vision">
+    <span class="section-label">Vision</span>
+    <h2 class="section-title">Four Pillars of Progress</h2>
+    <p class="section-subtitle">Every initiative I undertake is anchored in one of four transformational pillars shaping India's next decade.</p>
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="pillar-icon">⚡</div>
+        <h3 class="pillar-title">Technology</h3>
+        <p class="pillar-desc">Leveraging AI, digital infrastructure and emerging tech to create scalable, high-impact ventures that redefine industries.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">🌿</div>
+        <h3 class="pillar-title">Environment</h3>
+        <p class="pillar-desc">Championing CleanTech, renewable energy and sustainable practices that protect Goa's coastline and natural heritage.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">📚</div>
+        <h3 class="pillar-title">Education</h3>
+        <p class="pillar-desc">Democratising quality education through EdTech platforms that reach every corner of India's tier-2 and tier-3 cities.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">🚀</div>
+        <h3 class="pillar-title">Startups</h3>
+        <p class="pillar-desc">Backing founders with conviction, capital and connections — turning bold ideas into businesses that outlast their founders.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PORTFOLIO -->
+  <section id="portfolio">
+    <span class="section-label">Portfolio</span>
+    <h2 class="section-title">Six Sectors. One Vision.</h2>
+    <p class="section-subtitle">A diversified portfolio built on deep expertise, long-term thinking and genuine impact across the Indian economy.</p>
+    <div class="portfolio-grid">
+      <div class="portfolio-card">
+        <div class="portfolio-sector">Technology</div>
+        <h3 class="portfolio-name">Digital Ventures</h3>
+        <p class="portfolio-desc">AI-driven platforms and SaaS solutions targeting India's rapidly digitising SME sector and consumer markets.</p>
+      </div>
+      <div class="portfolio-card">
+        <div class="portfolio-sector">Real Estate</div>
+        <h3 class="portfolio-name">Goa Properties</h3>
+        <p class="portfolio-desc">Premium residential and commercial developments that blend modern design with Goa's distinctive architectural character.</p>
+      </div>
+      <div class="portfolio-card">
+        <div class="portfolio-sector">Pharma</div>
+        <h3 class="portfolio-name">Healthcare Investments</h3>
+        <p class="portfolio-desc">Strategic stakes in generic pharmaceuticals, nutraceuticals and diagnostic companies driving affordable healthcare.</p>
+      </div>
+      <div class="portfolio-card">
+        <div class="portfolio-sector">EdTech</div>
+        <h3 class="portfolio-name">Learning Platforms</h3>
+        <p class="portfolio-desc">Next-generation e-learning systems delivering vernacular, skill-based education to underserved Indian communities.</p>
+      </div>
+      <div class="portfolio-card">
+        <div class="portfolio-sector">Trade</div>
+        <h3 class="portfolio-name">Export & Import</h3>
+        <p class="portfolio-desc">Building trade corridors between India, the Middle East and South-East Asia across commodities and finished goods.</p>
+      </div>
+      <div class="portfolio-card">
+        <div class="portfolio-sector">CleanTech</div>
+        <h3 class="portfolio-name">Green Energy</h3>
+        <p class="portfolio-desc">Solar installations, green hydrogen projects and carbon credit initiatives advancing Goa's net-zero transition.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GOA 2030 -->
+  <section id="goa2030">
+    <span class="section-label">Goa 2030</span>
+    <h2 class="section-title">A State Transformed</h2>
+    <p class="section-subtitle">Measurable milestones anchoring my commitment to making Goa a model of sustainable prosperity.</p>
+    <div class="milestones-grid">
+      <div class="milestone-card">
+        <div class="milestone-number">₹500Cr</div>
+        <div class="milestone-label">Investments mobilised in Goa by 2030</div>
+      </div>
+      <div class="milestone-card">
+        <div class="milestone-number">10,000</div>
+        <div class="milestone-label">Skilled jobs created through portfolio ventures</div>
+      </div>
+      <div class="milestone-card">
+        <div class="milestone-number">50MW</div>
+        <div class="milestone-label">Renewable energy capacity installed in Goa</div>
+      </div>
+      <div class="milestone-card">
+        <div class="milestone-number">100+</div>
+        <div class="milestone-label">Startups mentored and funded across Goa</div>
+      </div>
+      <div class="milestone-card">
+        <div class="milestone-number">1M+</div>
+        <div class="milestone-label">Students reached through EdTech platforms</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOG PREVIEW -->
+  <section id="blog-preview">
+    <div class="blog-preview-header">
+      <div>
+        <span class="section-label">Latest from the Blog</span>
+        <h2 class="section-title">Perspectives & Insights</h2>
+      </div>
+      <a href="/blog/" class="view-all-btn">View All Posts →</a>
+    </div>
+    <div class="blog-preview-grid" id="blog-cards-container">
+<!-- BLOG_PREVIEW_START -->
+<div class="blog-preview-placeholder">
+  Daily blogs publish at 12:30 PM IST — check back soon or <a href="/blog/" style="color:var(--gold)">visit the full blog</a>.
+</div>
+<!-- BLOG_PREVIEW_END -->
+    </div>
+    <div style="text-align:center;margin-top:1rem;">
+      <a href="/blog/" class="view-all-btn">Explore All Articles →</a>
+    </div>
+  </section>
+
+  <!-- CREDO -->
+  <section id="credo">
+    <blockquote class="credo-quote">
+      "Goa is not just where I live — it is what I build for.<br>Every venture, every investment, every decision is a brick in its future."
+    </blockquote>
+    <span class="credo-attr">— Jayesh Parab</span>
+  </section>
+
+  <!-- CONNECT -->
+  <section id="connect">
+    <div class="connect-grid">
+      <div>
+        <span class="section-label">Connect</span>
+        <h2 class="section-title">Let's Build<br>Something Together</h2>
+        <div class="divider"></div>
+        <p class="connect-intro">
+          Whether you're a founder seeking guidance, an investor exploring partnerships, 
+          or someone who shares a vision for Goa's future — I'd love to hear from you.
+        </p>
+        <div class="social-links">
+          <a href="https://www.instagram.com/jayeshparab_goa" target="_blank" class="social-link">
+            <span class="social-platform">Instagram</span>
+            <span class="social-handle">@jayeshparab_goa</span>
+          </a>
+          <a href="https://www.linkedin.com/in/jayesh-parab-687163400/" target="_blank" class="social-link">
+            <span class="social-platform">LinkedIn</span>
+            <span class="social-handle">Jayesh Parab</span>
+          </a>
+          <a href="/blog/" class="social-link">
+            <span class="social-platform">Blog</span>
+            <span class="social-handle">Daily insights & perspectives</span>
+          </a>
+        </div>
+      </div>
+      <form class="connect-form" action="https://formspree.io/f/xnjorgbn" method="POST">
+        <input type="text" name="_gotcha" style="display:none">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" required placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label for="role">I am a</label>
+          <select id="role" name="role">
+            <option value="">Select your role</option>
+            <option value="founder">Founder / Entrepreneur</option>
+            <option value="investor">Investor / Fund Manager</option>
+            <option value="partner">Potential Partner</option>
+            <option value="journalist">Journalist / Media</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" required placeholder="Tell me about your idea, opportunity or question..."></textarea>
+        </div>
+        <button type="submit" class="form-submit">Send Message</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
   <footer>
-    <p>&copy; {TODAY.year} <a href="/">Jayesh Parab</a> &mdash; Goa, India</p>
+    <span class="footer-logo">Jayesh Parab</span>
+    <ul class="footer-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#vision">Vision</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="#connect">Contact</a></li>
+    </ul>
+    <span class="footer-copy">&copy; 2026 Jayesh Parab · Goa, India</span>
   </footer>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById('mobileMenu').classList.toggle('open');
+    }
+    function closeMenu() {
+      document.getElementById('mobileMenu').classList.remove('open');
+    }
+    // Close mobile menu on scroll
+    window.addEventListener('scroll', closeMenu);
+  </script>
+
 </body>
-</html>"""
-
-# ─── MAIN ─────────────────────────────────────────────────────────────────────
-
-def main():
-    log("=" * 60)
-    log(f"Blog Generator starting — {DATE_NICE}")
-    log("=" * 60)
-
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-    if not api_key:
-        log("✗ FATAL: ANTHROPIC_API_KEY environment variable is not set.")
-        log("  Fix: GitHub repo → Settings → Secrets → Actions → Add ANTHROPIC_API_KEY")
-        sys.exit(1)
-
-    log(f"✓ API key found (starts with: {api_key[:8]}...)")
-
-    client = anthropic.Anthropic(api_key=api_key)
-    BLOG_DIR.mkdir(parents=True, exist_ok=True)
-    log(f"✓ Output folder ready: {BLOG_DIR}")
-
-    new_posts = []
-    for i, topic in enumerate(TOPIC_BUCKETS):
-        log(f"\n[{i+1}/10] Topic: {topic[:55]}...")
-        post = generate_post(client, topic, i)
-        if not post:
-            log(f"  ✗ Skipping post {i+1}")
-            continue
-        filepath = BLOG_DIR / f"{post['slug']}.html"
-        filepath.write_text(post_html(post), encoding="utf-8")
-        log(f"  ✓ Saved: {filepath}")
-        new_posts.append(post)
-
-    log(f"\n{'='*60}")
-    log(f"Posts generated today: {len(new_posts)}/10")
-
-    # Load existing manifest
-    manifest_path = Path("blog/manifest.json")
-    all_posts = []
-    if manifest_path.exists():
-        with open(manifest_path, encoding="utf-8") as f:
-            all_posts = json.load(f)
-        log(f"Loaded {len(all_posts)} existing posts from manifest")
-
-    # Remove today's entries to avoid duplicates on re-run
-    all_posts = [p for p in all_posts if p.get("date_raw") != DATE_STR]
-    all_posts.extend(new_posts)
-
-    # Save manifest and rebuild index
-    manifest_path.write_text(json.dumps(all_posts, indent=2, ensure_ascii=False), encoding="utf-8")
-    INDEX_FILE.write_text(index_html(all_posts), encoding="utf-8")
-
-    log(f"✓ manifest.json updated ({len(all_posts)} total posts)")
-    log(f"✓ blog/index.html rebuilt")
-    log(f"\n✅ All done! {len(new_posts)} new posts live on jayeshparab.com/blog/")
-
-if __name__ == "__main__":
-    main()
+</html>
