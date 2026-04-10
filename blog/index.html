@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog | Jayesh Parab</title>
+  <meta name="description" content="Insights on Technology, CleanTech, EdTech, Real Estate, and Goa's future by Jayesh Parab.">
+  <link rel="canonical" href="https://jayeshparab.com/blog/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:  #061427;
+      --gold:  #C49A3C;
+      --white: #FFFFFF;
+      --muted: rgba(255,255,255,0.55);
+      --border: rgba(196,154,60,0.25);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--navy); color: var(--white);
+      font-family: 'Outfit', sans-serif;
+    }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(6,20,39,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 5%; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--gold); text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .page-hero {
+      margin-top: 64px;
+      padding: 80px 5% 60px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 1rem; display: block;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 700; line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    .hero-subtitle { color: var(--muted); font-size: 1.05rem; max-width: 560px; }
+    .post-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem; color: var(--muted);
+      margin-top: 1.5rem; letter-spacing: 0.08em;
+    }
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+      padding: 48px 5% 80px;
+      max-width: 1400px; margin: 0 auto;
+    }
+    .blog-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: border-color 0.25s, transform 0.25s;
+      display: flex; flex-direction: column; gap: 0.85rem;
+    }
+    .blog-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-3px);
+    }
+    .card-meta {
+      display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+    }
+    .category-pill {
+      background: rgba(196,154,60,0.15);
+      border: 1px solid var(--gold); color: var(--gold);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 10px; border-radius: 100px;
+    }
+    .card-date, .card-read {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; color: var(--muted);
+    }
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.45rem; font-weight: 700; line-height: 1.3;
+    }
+    .card-title a {
+      color: var(--white); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .card-title a:hover { color: var(--gold); }
+    .card-excerpt {
+      color: var(--muted); font-size: 0.92rem; line-height: 1.65;
+      flex: 1;
+    }
+    .read-more {
+      color: var(--gold); text-decoration: none;
+      font-size: 0.82rem; letter-spacing: 0.06em;
+      font-family: 'DM Mono', monospace;
+      transition: opacity 0.2s; margin-top: 0.5rem;
+    }
+    .read-more:hover { opacity: 0.7; }
+    footer {
+      text-align: center; padding: 2.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem; color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+    footer a { color: var(--gold); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="nav-logo">JP</a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/#connect">Connect</a></li>
+    </ul>
+  </nav>
+
+  <section class="page-hero">
+    <span class="hero-label">Perspectives &amp; Insights</span>
+    <h1 class="hero-title">The Blog</h1>
+    <p class="hero-subtitle">
+      Thoughts on Technology, CleanTech, Real Estate, EdTech, Pharma,
+      and building a better Goa — published daily.
+    </p>
+    <p class="post-count">0 articles published</p>
+  </section>
+
+  <main class="blog-grid">
+    
+  </main>
+
+  <footer>
+    <p>&copy; 2026 <a href="/">Jayesh Parab</a> &mdash; Goa, India</p>
+  </footer>
+</body>
+</html>
