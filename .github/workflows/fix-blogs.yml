@@ -1,0 +1,19 @@
+name: Fix Existing Blogs
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python fix_existing_blogs.py
+      - run: |
+          git config user.name "Blog Bot"
+          git config user.email "bot@jayeshparab.com"
+          git add blog/posts/
+          git diff --cached --quiet || git commit -m "Add Jayesh Parab keyword to all posts"
+          git push
