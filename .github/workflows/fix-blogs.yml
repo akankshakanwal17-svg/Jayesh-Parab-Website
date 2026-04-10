@@ -15,5 +15,5 @@ jobs:
           git config user.name "Blog Bot"
           git config user.email "bot@jayeshparab.com"
           git add blog/posts/
-          git diff --cached --quiet || git commit -m "Add Jayesh Parab keyword to all posts"
+          git diff --cached --quiet || git commit -m "Fix: Jayesh Parab keyword in all posts"
           git push
