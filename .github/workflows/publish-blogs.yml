@@ -1,0 +1,40 @@
+name: Daily Blog Publisher
+
+on:
+  schedule:
+    - cron: '0 7 * * *'   # 12:30 PM IST = 7:00 AM UTC
+  workflow_dispatch:        # Lets you click "Run" manually in GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  publish-blogs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic
+
+      - name: Generate and publish 10 blogs
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/generate_blogs.py
+
+      - name: Commit and push new blogs
+        run: |
+          git config user.name  "Blog Bot"
+          git config user.email "bot@jayeshparab.com"
+          git add blog/
+          git diff --cached --quiet || git commit -m "Daily blogs $(date +'%d %b %Y')"
+          git push
