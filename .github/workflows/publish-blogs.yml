@@ -2,8 +2,12 @@ name: Daily Blog Publisher
 
 on:
   schedule:
-    - cron: '0 7 * * *'   # 12:30 PM IST = 7:00 AM UTC
-  workflow_dispatch:        # Lets you click "Run" manually in GitHub
+    - cron: '0 7 * * *'     # 12:30 PM IST — primary run
+    - cron: '30 7 * * *'    # 1:00 PM IST  — backup run (if primary skipped)
+  workflow_dispatch:          # Manual trigger button in GitHub Actions tab
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: write
@@ -15,8 +19,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -25,6 +27,15 @@ jobs:
 
       - name: Install dependencies
         run: pip install anthropic
+
+      - name: Check API key is set
+        run: |
+          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "ANTHROPIC_API_KEY secret is NOT set."
+            exit 1
+          else
+            echo "ANTHROPIC_API_KEY is present."
+          fi
 
       - name: Generate and publish 10 blogs
         env:
@@ -35,6 +46,6 @@ jobs:
         run: |
           git config user.name  "Blog Bot"
           git config user.email "bot@jayeshparab.com"
-          git add blog/
+          git add blog/ sitemap.xml sitemap.html index.html
           git diff --cached --quiet || git commit -m "Daily blogs $(date +'%d %b %Y')"
           git push
