@@ -129,17 +129,17 @@
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       font-family: 'Playfair Display', serif;
-      font-size: clamp(10rem, 22vw, 18rem);
+      font-size: clamp(8rem, 20vw, 16rem);
       font-weight: 700;
-      color: rgba(196,154,60,0.04);
+      color: rgba(196,154,60,0.035);
       pointer-events: none;
       letter-spacing: -0.04em;
       white-space: nowrap;
+      z-index: 0;
     }
     .goals-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 0;
       position: relative;
       z-index: 1;
       border: 1px solid var(--border);
@@ -147,62 +147,64 @@
       overflow: hidden;
     }
     .goal-card {
-      padding: 2.5rem 1.75rem;
+      padding: 2.5rem 1.75rem 2.25rem;
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      gap: 1.5rem;
+      gap: 1.1rem;
       position: relative;
       transition: background 0.35s;
-      cursor: default;
     }
     .goal-card:last-child { border-right: none; }
-    .goal-card::after {
+    .goal-card::before {
       content: '';
       position: absolute;
-      bottom: 0; left: 0; right: 0;
+      top: 0; left: 0; right: 0;
       height: 2px;
-      background: var(--gold);
+      background: linear-gradient(90deg, var(--gold), transparent);
       transform: scaleX(0);
       transform-origin: left;
-      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+      transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
     }
-    .goal-card:hover { background: rgba(196,154,60,0.05); }
-    .goal-card:hover::after { transform: scaleX(1); }
-    .goal-icon {
-      width: 48px; height: 48px;
+    .goal-card:hover { background: rgba(196,154,60,0.04); }
+    .goal-card:hover::before { transform: scaleX(1); }
+    .goal-icon-wrap {
+      width: 44px; height: 44px;
+      opacity: 0.65;
+      transition: opacity 0.3s, transform 0.35s;
       flex-shrink: 0;
-      opacity: 0.7;
-      transition: opacity 0.3s, transform 0.3s;
     }
-    .goal-card:hover .goal-icon { opacity: 1; transform: translateY(-3px); }
-    .goal-roman {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.78rem;
-      font-weight: 600;
-      letter-spacing: 0.18em;
-      color: var(--gold);
-      opacity: 0.6;
-    }
-    .goal-text {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.25rem;
-      font-weight: 600;
-      line-height: 1.45;
-      color: var(--white);
-      transition: color 0.3s;
-    }
-    .goal-card:hover .goal-text { color: rgba(255,255,255,0.95); }
-    .goal-tag {
+    .goal-card:hover .goal-icon-wrap { opacity: 1; transform: translateY(-2px); }
+    .goal-category {
       font-family: 'DM Mono', monospace;
       font-size: 0.62rem;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--gold);
-      opacity: 0.65;
-      margin-top: auto;
+      opacity: 0.75;
     }
+    .goal-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.42;
+      color: var(--white);
+      flex: 1;
+    }
+    .goal-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.65;
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 0.35s, max-height 0.45s;
+    }
+    .goal-card:hover .goal-desc {
+      opacity: 1;
+      max-height: 120px;
+    }
+
 
     /* ── BLOG SECTION ── */
     #blog-preview { background: var(--navy); border-top: 1px solid var(--border); }
@@ -254,7 +256,7 @@
     /* ── RESPONSIVE ── */
     @media (max-width: 1024px) {
       .pillars-grid { grid-template-columns: repeat(2, 1fr); }
-      .goals-grid { grid-template-columns: repeat(3, 1fr); }
+      .goals-grid { grid-template-columns: repeat(3, 1fr); border-radius: 8px; }
       .goal-card { border-right: none; border-bottom: 1px solid var(--border); }
       .goal-card:last-child { border-bottom: none; }
       .blog-cards-grid { grid-template-columns: repeat(2, 1fr); }
@@ -266,7 +268,8 @@
       .hamburger { display: flex; }
       #about .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .pillars-grid { grid-template-columns: 1fr; }
-      .goals-grid { grid-template-columns: repeat(2, 1fr); }
+      .goals-grid { grid-template-columns: 1fr; border-radius: 8px; }
+      .goal-card { border-right: none; border-bottom: 1px solid var(--border); }
       .portfolio-grid { grid-template-columns: 1fr; }
       .blog-cards-grid { grid-template-columns: 1fr; }
       .connect-grid { grid-template-columns: 1fr; gap: 3rem; }
@@ -458,26 +461,77 @@
   <!-- GOA 2030 -->
   <section id="goa2030">
     <span class="section-label">Goa 2030</span>
-    <h2 class="section-title">A State Transformed</h2>
-    <p class="section-subtitle">Measurable milestones anchoring my commitment to making Goa a model of sustainable prosperity.</p>
-    <div class="milestones-grid">
-      <div class="milestone-card">
-        <div class="milestone-label">Investments mobilised in Goa by 2030</div>
+    <h2 class="section-title">The Vision, Defined</h2>
+    <p class="section-subtitle">Five commitments shaping the Goa I am determined to build — one venture, one decision, one year at a time.</p>
+
+    <div class="goals-grid">
+
+      <div class="goal-card">
+        <div class="goal-icon-wrap">
+          <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="26" cy="26" r="22" stroke="#C49A3C" stroke-width="0.8" opacity="0.4"/>
+            <path d="M26 14v24M20 19l6-6 6 6M20 33l6 6 6-6" stroke="#C49A3C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="goal-category">Capital</div>
+        <div class="goal-heading">Mobilise transformative investment across every corner of Goa</div>
+        <div class="goal-desc">Channelling capital into ventures that build lasting wealth, create infrastructure and establish Goa as a premier investment destination in India.</div>
       </div>
-      <div class="milestone-card">
-        <div class="milestone-label">Skilled jobs created through portfolio ventures</div>
+
+      <div class="goal-card">
+        <div class="goal-icon-wrap">
+          <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="18" r="7" stroke="#C49A3C" stroke-width="0.8"/>
+            <circle cx="34" cy="18" r="7" stroke="#C49A3C" stroke-width="0.8"/>
+            <path d="M6 40c0-7 5-11 12-11h16c7 0 12 4 12 11" stroke="#C49A3C" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>
+          </svg>
+        </div>
+        <div class="goal-category">Employment</div>
+        <div class="goal-heading">Create thousands of skilled, dignified jobs for Goa's people</div>
+        <div class="goal-desc">Building ventures that don't just generate profit but generate purpose — careers in technology, clean energy and knowledge industries rooted in Goa.</div>
       </div>
-      <div class="milestone-card">
-        <div class="milestone-label">Renewable energy capacity installed in Goa</div>
+
+      <div class="goal-card">
+        <div class="goal-icon-wrap">
+          <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="26" cy="26" r="9" stroke="#C49A3C" stroke-width="1.2"/>
+            <path d="M26 8v5M26 39v5M8 26h5M39 26h5M13.5 13.5l3.5 3.5M35 35l3.5 3.5M13.5 38.5l3.5-3.5M35 17l3.5-3.5" stroke="#C49A3C" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="goal-category">CleanTech</div>
+        <div class="goal-heading">Power Goa entirely through clean, renewable energy</div>
+        <div class="goal-desc">Installing solar, green hydrogen and sustainable infrastructure that protects Goa's coastline, reduces carbon footprint and leads India's green transition.</div>
       </div>
-      <div class="milestone-card">
-        <div class="milestone-label">Startups mentored and funded across Goa</div>
+
+      <div class="goal-card">
+        <div class="goal-icon-wrap">
+          <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M26 10l4 8 9 1.5-6.5 6.5 1.5 9L26 31l-8 4 1.5-9L13 19.5l9-1.5z" stroke="#C49A3C" stroke-width="1.2" stroke-linejoin="round"/>
+            <path d="M16 40c0-3 4.5-6 10-6s10 3 10 6" stroke="#C49A3C" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="goal-category">Startups</div>
+        <div class="goal-heading">Mentor and fund the next generation of Goan founders</div>
+        <div class="goal-desc">Providing capital, connections and conviction to ambitious entrepreneurs building from Goa — turning the state into a startup ecosystem others look up to.</div>
       </div>
-      <div class="milestone-card">
-        <div class="milestone-label">Students reached through EdTech platforms</div>
+
+      <div class="goal-card">
+        <div class="goal-icon-wrap">
+          <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 22l16-11 16 11v2L26 34 10 24v-2z" stroke="#C49A3C" stroke-width="1.2" stroke-linejoin="round"/>
+            <path d="M18 28v12M34 28v12M12 40h28" stroke="#C49A3C" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+            <circle cx="42" cy="26" r="2.5" stroke="#C49A3C" stroke-width="1"/>
+            <path d="M42 29v8" stroke="#C49A3C" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="goal-category">Education</div>
+        <div class="goal-heading">Reach millions of students through transformative EdTech</div>
+        <div class="goal-desc">Democratising access to world-class education across India's tier-2 and tier-3 cities — because where you are born should never limit how far you can go.</div>
       </div>
+
     </div>
   </section>
+
 
   <!-- BLOG PREVIEW — cards injected here by generate_blogs.py daily -->
   <section id="blog-preview">
