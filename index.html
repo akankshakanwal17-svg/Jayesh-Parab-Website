@@ -118,11 +118,91 @@
     .portfolio-desc { font-size: 0.86rem; color: var(--muted); line-height: 1.65; }
 
     /* ── GOA 2030 ── */
-    #goa2030 { background: var(--navy2); }
-    .milestones-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5rem; }
-    .milestone-card { border-top: 2px solid var(--gold); padding: 1.5rem 0; }
-    .milestone-number { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 0.5rem; }
-    .milestone-label { font-size: 0.88rem; color: var(--muted); line-height: 1.5; }
+    #goa2030 {
+      background: var(--navy);
+      position: relative;
+      overflow: hidden;
+    }
+    #goa2030::before {
+      content: '2030';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(10rem, 22vw, 18rem);
+      font-weight: 700;
+      color: rgba(196,154,60,0.04);
+      pointer-events: none;
+      letter-spacing: -0.04em;
+      white-space: nowrap;
+    }
+    .goals-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      position: relative;
+      z-index: 1;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .goal-card {
+      padding: 2.5rem 1.75rem;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+      position: relative;
+      transition: background 0.35s;
+      cursor: default;
+    }
+    .goal-card:last-child { border-right: none; }
+    .goal-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .goal-card:hover { background: rgba(196,154,60,0.05); }
+    .goal-card:hover::after { transform: scaleX(1); }
+    .goal-icon {
+      width: 48px; height: 48px;
+      flex-shrink: 0;
+      opacity: 0.7;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .goal-card:hover .goal-icon { opacity: 1; transform: translateY(-3px); }
+    .goal-roman {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      color: var(--gold);
+      opacity: 0.6;
+    }
+    .goal-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      line-height: 1.45;
+      color: var(--white);
+      transition: color 0.3s;
+    }
+    .goal-card:hover .goal-text { color: rgba(255,255,255,0.95); }
+    .goal-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.65;
+      margin-top: auto;
+    }
 
     /* ── BLOG SECTION ── */
     #blog-preview { background: var(--navy); border-top: 1px solid var(--border); }
@@ -174,7 +254,9 @@
     /* ── RESPONSIVE ── */
     @media (max-width: 1024px) {
       .pillars-grid { grid-template-columns: repeat(2, 1fr); }
-      .milestones-grid { grid-template-columns: repeat(3, 1fr); }
+      .goals-grid { grid-template-columns: repeat(3, 1fr); }
+      .goal-card { border-right: none; border-bottom: 1px solid var(--border); }
+      .goal-card:last-child { border-bottom: none; }
       .blog-cards-grid { grid-template-columns: repeat(2, 1fr); }
       .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
     }
@@ -184,7 +266,7 @@
       .hamburger { display: flex; }
       #about .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .pillars-grid { grid-template-columns: 1fr; }
-      .milestones-grid { grid-template-columns: repeat(2, 1fr); }
+      .goals-grid { grid-template-columns: repeat(2, 1fr); }
       .portfolio-grid { grid-template-columns: 1fr; }
       .blog-cards-grid { grid-template-columns: 1fr; }
       .connect-grid { grid-template-columns: 1fr; gap: 3rem; }
@@ -380,23 +462,18 @@
     <p class="section-subtitle">Measurable milestones anchoring my commitment to making Goa a model of sustainable prosperity.</p>
     <div class="milestones-grid">
       <div class="milestone-card">
-        <div class="milestone-number">₹500Cr</div>
         <div class="milestone-label">Investments mobilised in Goa by 2030</div>
       </div>
       <div class="milestone-card">
-        <div class="milestone-number">10,000</div>
         <div class="milestone-label">Skilled jobs created through portfolio ventures</div>
       </div>
       <div class="milestone-card">
-        <div class="milestone-number">50MW</div>
         <div class="milestone-label">Renewable energy capacity installed in Goa</div>
       </div>
       <div class="milestone-card">
-        <div class="milestone-number">100+</div>
         <div class="milestone-label">Startups mentored and funded across Goa</div>
       </div>
       <div class="milestone-card">
-        <div class="milestone-number">1M+</div>
         <div class="milestone-label">Students reached through EdTech platforms</div>
       </div>
     </div>
@@ -413,61 +490,6 @@
     </div>
     <div class="blog-cards-grid">
 <!-- BLOG_PREVIEW_START -->
-
-<a href="/blog/posts/2026-04-12-blog-01.html" class="blog-preview-card">
-  <div class="bp-meta">
-    <span class="bp-category">Entrepreneurship</span>
-    <span class="bp-date">12 April 2026</span>
-  </div>
-  <div class="bp-title">Goa's Startup Boom: Investment Climate & Growth Outlook 2025-30</div>
-  <p class="bp-excerpt">Goa's startup ecosystem is experiencing unprecedented growth with 340% increase in funding. Investment climate analysis ...</p>
-  <span class="bp-read">7 min read &#8594;</span>
-</a>
-<a href="/blog/posts/2026-04-12-blog-02.html" class="blog-preview-card">
-  <div class="bp-meta">
-    <span class="bp-category">CleanTech</span>
-    <span class="bp-date">12 April 2026</span>
-  </div>
-  <div class="bp-title">Coastal India's Clean Energy Revolution: Innovations Reshaping Tomorrow</div>
-  <p class="bp-excerpt">Explore how coastal India is leading CleanTech innovations with marine energy, solar solutions, and sustainable technolo...</p>
-  <span class="bp-read">6 min read &#8594;</span>
-</a>
-<a href="/blog/posts/2026-04-12-blog-03.html" class="blog-preview-card">
-  <div class="bp-meta">
-    <span class="bp-category">EdTech</span>
-    <span class="bp-date">12 April 2026</span>
-  </div>
-  <div class="bp-title">EdTech Revolution: Transforming Education in Tier-2 India</div>
-  <p class="bp-excerpt">Discover how EdTech innovations are revolutionizing education in tier-2 and tier-3 Indian cities, bridging the urban-rur...</p>
-  <span class="bp-read">7 min read &#8594;</span>
-</a>
-<a href="/blog/posts/2026-04-12-blog-04.html" class="blog-preview-card">
-  <div class="bp-meta">
-    <span class="bp-category">Real Estate</span>
-    <span class="bp-date">12 April 2026</span>
-  </div>
-  <div class="bp-title">Smart City Planning: Goa's Real Estate Renaissance by 2030</div>
-  <p class="bp-excerpt">Discover how smart city planning is transforming Goa's real estate landscape, creating sustainable developments that pre...</p>
-  <span class="bp-read">6 min read &#8594;</span>
-</a>
-<a href="/blog/posts/2026-04-12-blog-05.html" class="blog-preview-card">
-  <div class="bp-meta">
-    <span class="bp-category">Pharma</span>
-    <span class="bp-date">12 April 2026</span>
-  </div>
-  <div class="bp-title">India's Pharma Revolution: Leading Global Healthcare Innovation</div>
-  <p class="bp-excerpt">India emerges as a pharmaceutical powerhouse, driving global healthcare innovation through R&D excellence, cost-effectiv...</p>
-  <span class="bp-read">8 min read &#8594;</span>
-</a>
-<a href="/blog/posts/2026-04-12-blog-06.html" class="blog-preview-card">
-  <div class="bp-meta">
-    <span class="bp-category">Technology</span>
-    <span class="bp-date">12 April 2026</span>
-  </div>
-  <div class="bp-title">AI Leadership Revolution: Transforming Indian Business in 2026</div>
-  <p class="bp-excerpt">Explore how technology leaders are driving AI transformation in Indian businesses, from Goa's emerging tech hubs to nati...</p>
-  <span class="bp-read">8 min read &#8594;</span>
-</a>
 <!-- BLOG_PREVIEW_END -->
     </div>
     <div style="text-align:center; margin-top:2.5rem;">
